@@ -1,0 +1,403 @@
+@import url(./common.css);
+
+
+body{
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background-image:url('../src/image/background.png');
+    background-size:cover;
+    background-position:center;
+
+    font-family:sans-serif;
+}
+
+/* =========================
+   APP CONTAINER
+========================= */
+
+.container{
+    width:100%;
+    max-width:420px;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(12px);
+
+    overflow:hidden;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+#header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 20px;
+
+    background:rgba(255,255,255,.65);
+    backdrop-filter:blur(15px);
+
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+
+    z-index:10;
+}
+
+.room-title{
+    font-size:22px;
+    font-weight:700;
+    color:#183A5A;
+}
+
+.room-title span{
+    display:block;
+    font-size:11px;
+    color:#6B7280;
+    letter-spacing:2px;
+}
+
+.headerBtn{
+    width:42px;
+    height:42px;
+
+    border:none;
+    background:none;
+
+    cursor:pointer;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.headerBtn img{
+    width:30px;
+    height:30px;
+
+    object-fit:contain;
+
+    transition:.25s;
+}
+
+.headerBtn:hover{
+    transform:scale(1.1);
+}
+
+
+
+/* 채팅 */
+
+.chatBtn{
+    position:relative;
+
+    font-size:25px;
+}
+
+/* 알림 점 */
+
+.chatBtn::after{
+    content:"";
+
+    position:absolute;
+
+    top:7px;
+    right:4px;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#4FACFE;
+
+    box-shadow:
+    0 0 10px rgba(79,172,254,.6);
+}
+
+/* =========================
+   MAP
+========================= */
+
+#map{
+    flex:1;
+
+    border-radius:24px 24px 0 0;
+
+    overflow:hidden;
+
+    margin:12px 12px 0;
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.08);
+
+    position:relative;
+}
+
+/* =========================
+   FLOAT BUTTON
+========================= */
+
+.add-photo{
+    position:absolute;
+
+    right:20px;
+    bottom:50px;
+
+    width:64px;
+    height:64px;
+
+    border:none;
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #4FACFE,
+        #00F2FE
+    );
+
+    color:white;
+    font-size:38px;
+    font-weight:300;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 10px 25px rgba(0,168,232,.35);
+
+    transition:.3s;
+
+    z-index:100;
+}
+.add-photo:hover{
+    transform:
+        translateY(-4px)
+        scale(1.05);
+}
+
+.add-photo:active{
+    transform:scale(.95);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+#footer{
+    padding:18px;
+
+    background:rgba(255,255,255,.7);
+    backdrop-filter:blur(15px);
+
+    box-shadow:
+    0 -4px 15px rgba(0,0,0,.05);
+}
+
+.footer-title{
+    font-size:14px;
+    font-weight:700;
+
+    color:#183A5A;
+
+    margin-bottom:12px;
+}
+
+/* =========================
+   PROFILES
+========================= */
+
+.profile-list {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; /* 윗부분을 기준으로 정렬 */
+    gap: 15px;               /* 프로필과 버튼 사이의 간격 (추가 필수) */
+    
+    min-width: 60px;
+    overflow-x: auto;
+    padding-bottom: 5px;     /* 스크롤바가 생길 경우 대비 여백 */
+}
+
+/* 동그라미들이 찌그러지지 않도록 방지 */
+.profile-item, .profile-add {
+    flex-shrink: 0; 
+}
+
+.profile-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.profile-name{
+    margin-top:6px;
+
+    font-size:12px;
+    color:#183A5A;
+
+    text-align:center;
+
+    white-space:nowrap;
+}
+
+.profile-circle{
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    overflow:hidden;
+
+    background:white;
+
+    box-shadow:
+    0 4px 12px rgba(0,0,0,.08);
+}
+
+.profile-circle img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+.profile-add{
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(255,255,255,.8);
+
+    color:#183A5A;
+    font-size:24px;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 4px 12px rgba(0,0,0,.08);
+}
+
+/* =========================
+   ROOM META / POSTS
+========================= */
+
+
+.room-code-box{
+    margin-top:12px;
+    padding:10px 12px;
+
+    border-radius:14px;
+    background:rgba(255,255,255,.65);
+
+    color:#183A5A;
+    font-size:13px;
+}
+
+.post-list{
+    max-height:180px;
+    overflow:auto;
+
+    margin-top:14px;
+    padding-right:4px;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.empty-post{
+    padding:12px;
+    border-radius:14px;
+
+    color:#6B7280;
+    background:rgba(255,255,255,.55);
+
+    font-size:13px;
+    line-height:1.5;
+}
+
+.post-card{
+    padding:12px;
+    border-radius:16px;
+
+    background:rgba(255,255,255,.75);
+    color:#183A5A;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.post-meta{
+    margin-bottom:6px;
+
+    color:#6B7280;
+    font-size:12px;
+}
+
+.post-content-text{
+    font-size:14px;
+    line-height:1.5;
+}
+
+.post-image{
+    width:100%;
+    max-height:160px;
+
+    margin-top:8px;
+    border-radius:12px;
+
+    object-fit:cover;
+}
+
+/* 지도 위 프로필 마커 */
+.custom-profile-marker {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+    cursor: pointer;
+}
+.custom-profile-marker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 지도 위 미리보기 창 (말풍선) */
+.custom-preview-overlay {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    overflow: hidden;
+    cursor: pointer;
+    width: 180px;
+    transform: translateY(-20px); /* 마커보다 살짝 위로 띄움 */
+}
+.custom-preview-overlay .preview-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+.custom-preview-overlay .preview-text {
+    padding: 10px;
+    font-size: 13px;
+    color: #183A5A;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

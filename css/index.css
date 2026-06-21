@@ -1,0 +1,419 @@
+@import url(./common.css);
+
+/* =========================
+   LAYOUT
+========================= */
+
+.container{
+    min-height: 100vh;
+
+    background-image: url(../src/image/map3.png);
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: clamp(30px, 6vh, 60px);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    text-align: center;
+    animation: fadeUp 0.6s ease;
+    transition: .3s;
+}
+
+.header.signup-open{
+    transform: translateY(10px)!important;
+    
+}
+
+@keyframes fadeUp{
+    from{
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header h2{
+    color: #183A5A;
+    font-size: clamp(36px, 5vw, 66px);
+    font-weight: 800;
+    letter-spacing: 2px;
+
+    text-shadow: 0 6px 20px rgba(24,58,90,.12);
+}
+
+.header p{
+    margin-top: 10px;
+
+    font-family: 'Cafe24 Ssurround', sans-serif;
+    font-size: clamp(16px, 2.5vw, 24px);
+    font-weight: 300;
+
+    color: #5B6B7A;
+
+    letter-spacing: 1.5px;
+    text-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+
+/* =========================
+   BUTTON AREA
+========================= */
+
+.main_btn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 15px;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: .5s;
+}
+
+.btn.show{
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =========================
+   START BUTTON
+========================= */
+
+.start{
+    padding:
+        clamp(12px, 2vw, 16px)
+        clamp(40px, 6vw, 60px);
+
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 600;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4FACFE,
+            #00F2FE
+        );
+
+    border: none;
+    border-radius: 30px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,168,232,.3);
+
+    transition: .3s ease;
+}
+
+.start:hover{
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 12px 25px rgba(0,168,232,.4);
+}
+
+.start:active{
+    transform: scale(.97);
+}
+
+/* =========================
+   LOGIN / SIGNUP BUTTON
+========================= */
+
+#login,
+#signup{
+    width: clamp(160px, 30vw, 200px);
+    padding: 14px 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: clamp(14px, 2vw, 18px);
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4FACFE,
+            #00F2FE
+        );
+
+    border: none;
+    border-radius: 30px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,168,232,.3);
+
+    transition: .3s ease;
+}
+
+#login:hover,
+#signup:hover{
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 12px 25px rgba(0,168,232,.4);
+}
+
+#login:active,
+#signup:active{
+    transform: scale(.97);
+}
+
+/* =========================
+   FORM
+========================= */
+
+.log,
+.sign{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 0px;
+}
+
+.log.show,
+.sign.show{
+    display: flex;
+}
+
+.sign.show{transform: translateY(-100px);}
+
+/* =========================
+   INPUT
+========================= */
+
+.input{
+    width: 280px;
+    padding: 14px 18px;
+
+    font-size: 15px;
+    color: #183A5A;
+
+    background: rgba(255,255,255,.75);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,.4);
+    border-radius: 14px;
+
+    outline: none;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.08);
+
+    transition: .25s ease;
+}
+
+.input:focus{
+    background: rgba(255,255,255,.9);
+
+    border: 1px solid #4FACFE;
+
+    box-shadow:
+        0 0 0 3px rgba(79,172,254,.25);
+}
+
+.input::placeholder{
+    color: #8AA0B3;
+    font-size: 14px;
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+
+.log input[type="submit"],
+.sign input[type="submit"]{
+    width: 280px;
+    padding: 14px;
+
+    color: white;
+    font-weight: 600;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4FACFE,
+            #00F2FE
+        );
+
+    border: none;
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,168,232,.3);
+
+    transition: .3s;
+}
+
+.log input[type="submit"]:hover,
+.sign input[type="submit"]:hover{
+    transform: translateY(-3px);
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.backBtn{
+    margin-top: 10px;
+
+    background: transparent;
+    border: none;
+
+    color: #4FACFE;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.backBtn:hover{
+    color: #1E88E5;
+    transform: translateY(-2px);
+}
+
+.preview-area{
+    text-align:center;
+    position: relative;
+
+    width: 120px;
+    margin: 0 auto;
+}
+
+
+#removeProfile{
+    display:block;
+
+    margin:10px auto 0;
+
+    border:none;
+    background:none;
+
+    cursor:pointer;
+    font-size:18px;
+}
+
+.upload-btn{
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 14px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.4);
+
+    color: #183A5A;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 18px rgba(24,58,90,0.08);
+
+    transition: all .25s ease;
+}
+
+.upload-btn:hover{
+    background: rgba(255,255,255,0.9);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 24px rgba(24,58,90,0.12);
+}
+
+.upload-btn:active{
+    transform: scale(.98);
+}
+
+#previewImg{
+    width: 120px;
+    height: 120px;
+
+    margin-bottom: 12px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 4px solid rgba(255,255,255,0.7);
+
+    background: rgba(255,255,255,0.4);
+
+    box-shadow:
+        0 8px 20px rgba(24,58,90,0.12);
+}
+
+#removeProfile{
+    position: absolute;
+
+    top: -5px;
+    right: -5px;
+
+    width: 28px;
+    height: 28px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(0,0,0,0.7);
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: .2s;
+}
+
+#removeProfile:hover{
+    transform: scale(1.1);
+}

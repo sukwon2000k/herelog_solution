@@ -1,0 +1,543 @@
+@import url('./common.css');
+
+/* =========================
+   LAYOUT
+========================= */
+
+.container{
+    min-height: 100vh;
+    position: relative;
+
+    background-image: url('../src/image/background.png');
+    background-size: cover;
+    background-position: center;
+
+    padding: 20px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+#header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 30px;
+}
+
+.headerBtn{
+    border: none;
+    border-radius: 20px;
+
+    padding: 12px 20px;
+
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+
+    color: #183A5A;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   GALLERY
+========================= */
+
+.gallery{
+    width: 100%;
+    max-width: 400px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================
+   ALBUM CARD
+========================= */
+
+.album{
+    aspect-ratio: 1 / 1;   /* 정사각형 */
+    border-radius: 20px;
+    overflow: hidden;
+
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(12px);
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+
+    position: relative;
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.album:hover{
+    transform: translateY(-3px);
+}
+
+.album img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.album-info{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 12px;
+
+    color: white;
+
+    background: linear-gradient(
+        transparent,
+        rgba(0,0,0,0.55)
+    );
+}
+
+.album-info h3{
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.album-info p{
+    font-size: 12px;
+}
+
+/* =========================
+   CREATE ROOM
+========================= */
+
+.create-room{
+    aspect-ratio: 1 / 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 2px dashed rgba(24,58,90,.25);
+
+    background: rgba(255,255,255,.55);
+
+    color: #183A5A;
+}
+
+.create-room span{
+    font-size: 60px;
+    line-height: 1;
+}
+
+.create-room p{
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================
+   ROOM LIST
+========================= */
+
+#roomList{
+    display: contents;
+}
+
+.logo h1{
+    display:flex;
+    flex-direction:column;
+
+    color:#183A5A;
+    font-size:34px;
+}
+
+.logo h1 span{
+    font-size:13px;
+    font-weight:400;
+
+    color:#6B7280;
+    text-align: center;
+    letter-spacing:3px;
+}
+
+.create-box{
+    display: none;
+    
+
+    width: 320px;
+    margin: 25px auto;
+
+    padding: 24px;
+
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(15px);
+
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 30px rgba(24,58,90,0.12);
+
+    animation: fadeUp .3s ease;
+}
+
+.create-box.show{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%, -70%);
+
+    z-index:1000; 
+}
+
+.create-box h3{
+    margin: 0 0 8px 0;
+
+    text-align: center;
+    color: #183A5A;
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.create-box input{
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 14px 18px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.85);
+
+    color: #183A5A;
+    font-size: 15px;
+
+    outline: none;
+
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.create-box input::placeholder{
+    color: #8aa0b3;
+}
+
+.create-box input:focus{
+    box-shadow:
+        0 0 0 3px rgba(79,172,254,.25);
+}
+
+#createBtn, #cancelBtn{
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #4FACFE,
+        #00F2FE
+    );
+
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(0,168,232,.25);
+
+    transition: .25s;
+}
+
+#createBtn:hover, #cancelBtn:hover{
+    transform: translateY(-3px);
+    box-shadow:
+        0 12px 25px rgba(0,168,232,.35);
+}
+
+.create-box input[type="file"]{
+    padding: 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+#room-img{
+    display:none;
+}
+
+.upload-btn{
+    width:100%;
+    box-sizing:border-box;
+    font-size: 12px;
+
+    padding:14px;
+
+    text-align:center;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(10px);
+
+    color:#183A5A;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    border:1px solid rgba(24,58,90,.1);
+}
+
+.upload-btn:hover{
+    background:rgba(255,255,255,0.9);
+}
+
+#preimg{
+    display: none;
+    width:100%;
+    max-width:280px;
+
+    height:180px;
+
+    object-fit:cover;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.5);
+
+    border:1px solid rgba(255,255,255,.3);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.08);
+}
+
+/* =========================
+   JOIN ROOM FORM
+========================= */
+
+.join-room-wrap{
+    width:100%;
+    max-width:400px;
+    margin:0 auto 18px;
+}
+
+.join-room-form{
+    display:flex;
+    gap:8px;
+
+    padding:10px;
+    border-radius:18px;
+
+    background:rgba(255,255,255,.65);
+    backdrop-filter:blur(12px);
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.join-room-form input{
+    flex:1;
+    min-width:0;
+
+    border:none;
+    outline:none;
+    border-radius:12px;
+
+    padding:12px 14px;
+
+    color:#183A5A;
+    background:rgba(255,255,255,.85);
+}
+
+.join-room-form button{
+    border:none;
+    border-radius:12px;
+
+    padding:0 16px;
+
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+
+    background:linear-gradient(135deg,#4FACFE,#00F2FE);
+}
+
+.empty-room-message{
+    grid-column:1 / -1;
+
+    padding:18px;
+    border-radius:18px;
+
+    background:rgba(255,255,255,.7);
+    color:#183A5A;
+
+    font-size:14px;
+    line-height:1.6;
+    text-align:center;
+}
+
+.album-placeholder{
+    width:100%;
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#183A5A;
+    font-weight:700;
+    letter-spacing:1px;
+
+    background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(79,172,254,.35));
+}
+
+.profile-menu{
+    position: relative;
+}
+
+.profileBtn{
+    padding: 0;
+    width: 52px;
+    height: 52px;
+
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile-thumb{
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.profile-dropdown{
+    display: none;
+
+    position: absolute;
+    top: 60px;
+    right: 0;
+
+    min-width: 120px;
+
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.1);
+
+    z-index: 1000;
+}
+
+.profile-dropdown.show{
+    display: block;
+}
+
+.profile-dropdown a{
+    display: block;
+
+    padding: 12px 16px;
+
+    color: #183A5A;
+    text-decoration: none;
+
+    transition: .2s;
+}
+
+.profile-dropdown a:hover{
+    background: rgba(79,172,254,.1);
+}
+
+.profile-modal{
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.4);
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+}
+
+.profile-modal.show{
+    display:flex;
+}
+
+.profile-card{
+    position:relative;
+
+    width:320px;
+
+    padding:30px;
+
+    text-align:center;
+
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(15px);
+
+    border-radius:24px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.15);
+}
+
+.profile-large{
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+    object-fit:cover;
+
+    margin-bottom:15px;
+}
+
+.profile-card h2{
+    color:#183A5A;
+    margin-bottom:8px;
+}
+
+.profile-card p{
+    color:#6B7280;
+}
+
+.close-profile{
+    position:absolute;
+
+    top:10px;
+    right:10px;
+
+    border:none;
+    background:none;
+
+    font-size:20px;
+    cursor:pointer;
+}

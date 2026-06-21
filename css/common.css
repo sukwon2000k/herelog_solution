@@ -1,0 +1,20 @@
+/* 전체 요소들의 기본 마진, 패딩 제거 */
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+/* 리스트의 블릿기호 제거 */
+ul{list-style: none;}
+
+/* anchor 요소의 밑줄 제거 */
+a{
+    text-decoration: none;
+    color: inherit; /* 부모요소의 색상을 그대로 상속받아 적용 */
+}
+
+/* 요소들의 폰트사이즈의 기준크기를 정하기 위해.. */
+body{
+    font-size: 10px; /*자손 요소들 중에 1.4rem이면 14px..로 계산하기 쉽게..*/
+}
