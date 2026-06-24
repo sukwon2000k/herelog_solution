@@ -16,6 +16,7 @@ mysqli_close($db);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>새 기록 작성 - HereLog</title>
     <link rel="stylesheet" href="./css/post.css">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b995ce9beb583c59c83fea479f81d637&libraries=services"></script>
     <script src="./js/post.js" defer></script>
 </head>
 <body>
@@ -27,9 +28,7 @@ mysqli_close($db);
         enctype="multipart/form-data">
 
         <input type="hidden" name="roomcode" value="<?php echo e($roomcode); ?>">
-        <input type="hidden" name="lat" id="lat" value="">
-        <input type="hidden" name="lng" id="lng" value="">
-        <input type="hidden" name="address" id="address" value="">
+        
 
         <!-- 헤더 -->
         <div id="header">
@@ -52,9 +51,19 @@ mysqli_close($db);
 
             <!-- 현재 위치 -->
             <div class="location-info" id="location-info">
-                📍 현재 위치 불러오는 중...
+                📍 현재 위치 장소명 불러오는 중...
             </div>
 
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lng" id="lng">
+
+            <input
+                type="text"
+                name="address"
+                id="address"
+                class="location-input"
+                placeholder="장소명을 직접 수정할 수 있어요"
+                autocomplete="off">
             <!-- 사진 선택 -->
             <input
                 type="file"

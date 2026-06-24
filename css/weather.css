@@ -1,0 +1,245 @@
+/* =========================
+   WEATHER EFFECT
+========================= */
+
+#weather-container{
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+    overflow: hidden;
+
+    z-index: 3;
+}
+
+/* 비 */
+.weather-rain{
+    position: absolute;
+    top: 0;
+
+    width: 2px;
+    height: 18px;
+
+    border-radius: 999px;
+    background: rgba(120, 180, 255, 0.55);
+
+    opacity: 0.75;
+
+    transform:
+        translate3d(0, var(--start-y), 0)
+        rotate(12deg);
+
+    animation:
+        weatherRainFall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes weatherRainFall{
+    0%{
+        transform:
+            translate3d(0, var(--start-y), 0)
+            rotate(12deg);
+    }
+
+    100%{
+        transform:
+            translate3d(-28px, 115vh, 0)
+            rotate(12deg);
+    }
+}
+
+/* 눈 */
+.weather-snow{
+    position: absolute;
+    top: 0;
+
+    width: var(--size);
+    height: var(--size);
+
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.88);
+
+    opacity: var(--opacity);
+    filter: blur(var(--blur));
+
+    transform:
+        translate3d(0, var(--start-y), 0);
+
+    animation:
+        weatherSnowFall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes weatherSnowFall{
+    0%{
+        transform:
+            translate3d(0, var(--start-y), 0);
+    }
+
+    25%{
+        transform:
+            translate3d(var(--sway), 25vh, 0);
+    }
+
+    50%{
+        transform:
+            translate3d(var(--drift-half), 55vh, 0);
+    }
+
+    75%{
+        transform:
+            translate3d(calc(var(--drift) - var(--sway)), 83vh, 0);
+    }
+
+    100%{
+        transform:
+            translate3d(var(--drift), 112vh, 0);
+    }
+}
+
+/* 꽃잎 */
+.weather-flower{
+    position: absolute;
+    top: 0;
+
+    width: var(--size);
+    height: calc(var(--size) * 0.72);
+
+    border-radius: 80% 0 80% 0;
+
+    background: rgba(255, 185, 205, 0.78);
+
+    opacity: var(--opacity);
+    filter: blur(var(--blur));
+
+    transform:
+        translate3d(0, var(--start-y), 0)
+        rotate(var(--rotate));
+
+    animation:
+        weatherFlowerFall var(--duration) linear var(--delay) infinite;
+}
+
+.weather-flower:nth-child(3n){
+    background: rgba(255, 220, 230, 0.72);
+}
+
+.weather-flower:nth-child(4n){
+    background: rgba(255, 170, 190, 0.62);
+}
+
+.weather-flower:nth-child(5n){
+    border-radius: 70% 30% 70% 30%;
+}
+
+@keyframes weatherFlowerFall{
+    0%{
+        transform:
+            translate3d(0, var(--start-y), 0)
+            rotate(var(--rotate));
+    }
+
+    25%{
+        transform:
+            translate3d(var(--sway), 25vh, 0)
+            rotate(calc(var(--rotate) + 120deg));
+    }
+
+    50%{
+        transform:
+            translate3d(var(--drift-half), 55vh, 0)
+            rotate(calc(var(--rotate) + 260deg));
+    }
+
+    75%{
+        transform:
+            translate3d(calc(var(--drift) - var(--sway)), 83vh, 0)
+            rotate(calc(var(--rotate) + 390deg));
+    }
+
+    100%{
+        transform:
+            translate3d(var(--drift), 112vh, 0)
+            rotate(calc(var(--rotate) + 540deg));
+    }
+}
+
+/* =========================
+   PETAL LAYER
+========================= */
+
+.petal-layer{
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+    overflow: hidden;
+
+    z-index: 1;
+}
+
+.petal{
+    position: absolute;
+
+    top: 0;
+    left: var(--left);
+
+    width: var(--size);
+    height: calc(var(--size) * 0.72);
+
+    border-radius: 80% 0 80% 0;
+
+    background: rgba(255, 185, 205, 0.78);
+
+    opacity: var(--opacity);
+    filter: blur(var(--blur));
+
+    transform:
+        translate3d(0, var(--start-y), 0)
+        rotate(var(--rotate));
+
+    animation:
+        petalFall var(--duration) linear var(--delay) infinite;
+}
+
+.petal:nth-child(3n){
+    background: rgba(255, 220, 230, 0.72);
+}
+
+.petal:nth-child(4n){
+    background: rgba(255, 170, 190, 0.62);
+}
+
+.petal:nth-child(5n){
+    border-radius: 70% 30% 70% 30%;
+}
+
+@keyframes petalFall{
+    0%{
+        transform:
+            translate3d(0, var(--start-y), 0)
+            rotate(var(--rotate));
+    }
+
+    25%{
+        transform:
+            translate3d(var(--sway), 25vh, 0)
+            rotate(calc(var(--rotate) + 120deg));
+    }
+
+    50%{
+        transform:
+            translate3d(var(--drift-half), 55vh, 0)
+            rotate(calc(var(--rotate) + 260deg));
+    }
+
+    75%{
+        transform:
+            translate3d(calc(var(--drift) - var(--sway)), 83vh, 0)
+            rotate(calc(var(--rotate) + 390deg));
+    }
+
+    100%{
+        transform:
+            translate3d(var(--drift), 112vh, 0)
+            rotate(calc(var(--rotate) + 540deg));
+    }
+}

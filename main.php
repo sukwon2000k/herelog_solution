@@ -1,10 +1,14 @@
 <?php
-require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/config/room.php';
 require_login('./index.html');
 // 프로필 사진 가져오기
 $user_id = current_user_id();
 
 $db = db_connect();
+
+// 기본 공용 방: 방 코드 입력 없이 누구나 처음부터 들어갈 수 있는 공간이다.
+ensure_herelog_public_room_member($db, $user_id);
+$publicRoomCode = herelog_public_room_code();
 
 $userSql = "
 SELECT
@@ -28,18 +32,38 @@ $profileImg = $userRow['profile_img'] ?? 'uploads/profile/default.png';
 mysqli_stmt_close($userStmt);
 
 $user_id = current_user_id();
-$db = db_connect();
 
 $sql = '
-    SELECT r.*
+    SELECT
+        r.*,
+        COALESCE(member_counts.member_count, 0) AS member_count,
+        CASE WHEN r.roomcode = ? THEN 0 ELSE 1 END AS public_sort
     FROM HereLogRoom r
-    JOIN HereLogRoomMember m
-        ON r.no = m.room_no
-    WHERE m.user_id = ?
-    ORDER BY r.no DESC
+    JOIN (
+        SELECT DISTINCT room_no
+        FROM HereLogRoomMember
+        WHERE user_id = ?
+    ) AS my_member
+        ON r.no = my_member.room_no
+    LEFT JOIN (
+        SELECT
+            room_no,
+            COUNT(DISTINCT user_id) AS member_count
+        FROM HereLogRoomMember
+        GROUP BY room_no
+    ) AS member_counts
+        ON r.no = member_counts.room_no
+    WHERE
+        r.roomcode <> ?
+        OR r.no = (
+            SELECT MIN(no)
+            FROM HereLogRoom
+            WHERE roomcode = ?
+        )
+    ORDER BY public_sort ASC, r.no DESC
 ';
 $stmt = mysqli_prepare($db, $sql);
-mysqli_stmt_bind_param($stmt, 's', $user_id);
+mysqli_stmt_bind_param($stmt, 'ssss', $publicRoomCode, $user_id, $publicRoomCode, $publicRoomCode);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 ?>
@@ -51,11 +75,15 @@ $result = mysqli_stmt_get_result($stmt);
     <title>HereLog</title>
 
     <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/delete_actions.css?v=1">
+    <link rel="stylesheet" href="./css/weather.css">
+    <script src="./js/weather.js?v=2" defer></script>
     <script src="./js/main.js" defer></script>
 </head>
 <body>
 
     <div class="container">
+        <div class="petal-layer" id="petalLayer" aria-hidden="true"></div>
 
         <div id="header">
             <div class="logo">
@@ -111,7 +139,7 @@ $result = mysqli_stmt_get_result($stmt);
 <?php } ?>
 
 <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-                <div class="album" onclick="location.href='./room.php?code=<?php echo urlencode($row['roomcode']); ?>'">
+                <div class="album" onclick="location.href='<?php echo is_herelog_public_room($row) ? './room.php?public=1' : './room.php?code=' . urlencode($row['roomcode']); ?>'">
 
 <?php if (!empty($row['imgpath'])) { ?>
                     <img src="./board/<?php echo e($row['imgpath']); ?>" alt="<?php echo e($row['roomname']); ?> 대표 이미지">
@@ -121,7 +149,7 @@ $result = mysqli_stmt_get_result($stmt);
 
                     <div class="album-info">
                         <h3><?php echo e($row['roomname']); ?></h3>
-                        <p>👤 <?php echo e($row['ownername']); ?></p>
+                        <p>👥 멤버 <?php echo number_format((int)($row['member_count'] ?? 0)); ?>명</p>
                     </div>
 
                 </div>
@@ -193,6 +221,34 @@ $result = mysqli_stmt_get_result($stmt);
 
                 <h2><?php echo e($name); ?></h2>
                 <p>@<?php echo e($nickname); ?></p>
+                <div class="account-delete-box">
+    <p class="account-delete-title">계정 삭제</p>
+    <p class="account-delete-help">
+        삭제하면 내 게시글, 댓글, 좋아요, 프로필이 삭제됩니다.<br>
+        방장인 방은 다른 멤버가 있으면 방장이 이전되고, 혼자 있는 방은 삭제됩니다.
+    </p>
+
+    <form
+        action="./board/delete_account.php"
+        method="post"
+        onsubmit="return confirm('정말 계정을 삭제할까요? 이 작업은 되돌릴 수 없습니다.');">
+        <input
+            type="password"
+            name="password"
+            placeholder="비밀번호 확인"
+            required>
+
+        <input
+            type="text"
+            name="confirm_text"
+            placeholder="계정삭제 입력"
+            required>
+
+        <button class="account-delete-button" type="submit">
+            계정 삭제
+        </button>
+    </form>
+</div>
 
             </div>
 

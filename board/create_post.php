@@ -30,7 +30,14 @@ $address = trim($_POST['address'] ?? '');
 
 $lat = is_numeric($latRaw) ? (float)$latRaw : null;
 $lng = is_numeric($lngRaw) ? (float)$lngRaw : null;
-$address = $address !== '' ? $address : null;
+
+if ($address !== '') {
+    $address = function_exists('mb_substr')
+        ? mb_substr($address, 0, 500, 'UTF-8')
+        : substr($address, 0, 500);
+} else {
+    $address = null;
+}
 
 $db = db_connect();
 $room = require_room_member($db, $roomcode, $user_id, '../main.php');

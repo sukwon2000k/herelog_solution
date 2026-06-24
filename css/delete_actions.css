@@ -1,0 +1,108 @@
+/* =========================
+   DELETE ACTIONS
+========================= */
+
+.delete-inline-form{
+    margin:0;
+}
+
+.delete-post-form{
+    margin:16px 0 0;
+}
+
+.delete-button,
+.comment-delete-button,
+.account-delete-button{
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.2s;
+}
+
+.delete-button{
+    width:100%;
+    min-height:44px;
+    border-radius:18px;
+    background:rgba(239,68,68,.10);
+    color:#B91C1C;
+    font-size:14px;
+    font-weight:800;
+}
+
+.delete-button:hover{
+    transform:translateY(-2px);
+    background:rgba(239,68,68,.18);
+}
+
+.comment-top-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+}
+
+.comment-delete-button{
+    padding:5px 9px;
+    border-radius:999px;
+    background:rgba(239,68,68,.08);
+    color:#B91C1C;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.comment-delete-button:hover{
+    background:rgba(239,68,68,.16);
+}
+
+.account-delete-box{
+    width:100%;
+    box-sizing:border-box;
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid rgba(24,58,90,.10);
+}
+
+.account-delete-title{
+    margin:0 0 8px;
+    color:#B91C1C;
+    font-size:14px;
+    font-weight:900;
+}
+
+.account-delete-help{
+    margin:0 0 10px;
+    color:#6B7280;
+    font-size:12px;
+    line-height:1.45;
+}
+
+.account-delete-box input{
+    width:100%;
+    box-sizing:border-box;
+    margin-bottom:8px;
+    padding:11px 12px;
+    border:none;
+    border-radius:14px;
+    background:rgba(255,255,255,.82);
+    color:#183A5A;
+    outline:none;
+}
+
+.account-delete-box input:focus{
+    box-shadow:0 0 0 3px rgba(239,68,68,.16);
+}
+
+.account-delete-button{
+    width:100%;
+    height:42px;
+    border-radius:14px;
+    background:#B91C1C;
+    color:white;
+    font-size:13px;
+    font-weight:900;
+}
+
+.account-delete-button:hover{
+    background:#991B1B;
+}

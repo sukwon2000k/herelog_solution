@@ -4,13 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HereLog</title>
+    <meta property="og:title" content="HereLog">
+    <meta property="og:description" content="여기에 기록하는 우리의 순간">
+    <meta property="og:image" content="https://hello2026.dothome.co.kr/herelog/src/image/map3.png">
+    <meta property="og:url" content="https://hello2026.dothome.co.kr/herelog">
+
 
     <link rel="stylesheet" href="./css/index.css">
-    <script src="./js/index.js" defer></script>
+    <link rel="stylesheet" href="./css/weather.css">
+    <script src="./js/weather.js?v=2" defer></script>
+    <script src="./js/index.js?v=2" defer></script>
 </head>
 <body>
     
     <div class="container">
+        <div class="petal-layer" id="petalLayer" aria-hidden="true"></div>
         <div class="header">
             <h2>ここログ</h2>
             <p>여기에 기록하는 이 순간</p>

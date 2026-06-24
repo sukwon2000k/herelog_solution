@@ -330,3 +330,42 @@ body{
 .upload-btn.small p{
     margin-top:0;
 }
+
+.location-info[data-state="loading"]{
+    color:#4B5563;
+}
+
+.location-info[data-state="success"]{
+    color:#183A5A;
+    font-weight:600;
+}
+
+.location-info[data-state="error"]{
+    color:#8B5E34;
+}
+
+.location-input{
+    width:100%;
+    box-sizing:border-box;
+
+    margin-top:10px;
+    padding:12px 14px;
+
+    border:none;
+    border-radius:14px;
+
+    background:rgba(255,255,255,.8);
+    color:#183A5A;
+
+    font-size:14px;
+    outline:none;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+.location-input:focus{
+    background:white;
+    box-shadow:
+        0 0 0 3px rgba(79,172,254,.22),
+        0 6px 16px rgba(0,0,0,.08);
+}

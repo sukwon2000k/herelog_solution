@@ -1,0 +1,175 @@
+/* =========================
+   ROOM MEMBER PROFILE MODAL
+========================= */
+
+.profile-item.member-profile-btn {
+    border: none;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+}
+
+.profile-item.member-profile-btn:hover .profile-circle {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .14);
+}
+
+.profile-item.member-profile-btn:active .profile-circle {
+    transform: scale(.96);
+}
+
+.profile-circle {
+    transition: .2s;
+}
+
+.member-modal[hidden] {
+    display: none !important;
+}
+
+body.member-modal-open {
+    overflow: hidden;
+}
+
+.member-modal {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, .42);
+    backdrop-filter: blur(4px);
+
+    z-index: 9999;
+}
+
+.member-card {
+    position: relative;
+
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+
+    padding: 30px 24px 24px;
+
+    text-align: center;
+
+    background: rgba(255, 255, 255, .94);
+    backdrop-filter: blur(15px);
+
+    border-radius: 24px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .16);
+
+    animation: memberCardIn .18s ease-out;
+}
+
+@keyframes memberCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.close-member-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+    background: rgba(238, 242, 247, .9);
+
+    color: #183A5A;
+    font-size: 18px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.close-member-modal:hover {
+    background: #E5EAF1;
+}
+
+.member-large {
+    width: 118px;
+    height: 118px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    margin-bottom: 14px;
+
+    background: white;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .10);
+}
+
+.member-card h2 {
+    margin: 0 0 5px;
+
+    color: #183A5A;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.member-card .member-nickname {
+    margin: 0 0 18px;
+
+    color: #6B7280;
+    font-size: 14px;
+}
+
+.member-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    text-align: left;
+}
+
+.member-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    border-radius: 14px;
+    background: rgba(79, 172, 254, .09);
+
+    color: #183A5A;
+}
+
+.member-info-row span {
+    flex: 0 0 auto;
+
+    color: #6B7280;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.member-info-row strong {
+    min-width: 0;
+
+    color: #183A5A;
+    font-size: 13px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
