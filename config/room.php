@@ -182,6 +182,324 @@ function leave_room_member(mysqli $db, int $room_no, string $user_id): void
     mysqli_stmt_close($stmt);
 }
 
+
+function herelog_table_exists(mysqli $db, string $table): bool
+{
+    $sql = '
+        SELECT COUNT(*) AS cnt
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+    ';
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $table);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    return (int)($row['cnt'] ?? 0) > 0;
+}
+
+function herelog_column_exists(mysqli $db, string $table, string $column): bool
+{
+    $sql = '
+        SELECT COUNT(*) AS cnt
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND COLUMN_NAME = ?
+    ';
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'ss', $table, $column);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    return (int)($row['cnt'] ?? 0) > 0;
+}
+
+if (!function_exists('is_room_owner_user')) {
+    function is_room_owner_user(mysqli $db, int $room_no, string $user_id): bool
+    {
+        $role = get_room_member_role($db, $room_no, $user_id);
+        if ($role === 'owner') {
+            return true;
+        }
+
+        if (herelog_column_exists($db, 'HereLogRoom', 'owner_id')) {
+            $sql = 'SELECT no FROM HereLogRoom WHERE no = ? AND owner_id = ? LIMIT 1';
+            $stmt = mysqli_prepare($db, $sql);
+            mysqli_stmt_bind_param($stmt, 'is', $room_no, $user_id);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $isOwner = mysqli_num_rows($result) > 0;
+            mysqli_stmt_close($stmt);
+            return $isOwner;
+        }
+
+        return false;
+    }
+}
+
+function get_room_member_display_name(mysqli $db, string $user_id): string
+{
+    $sql = '
+        SELECT name, nickname
+        FROM HereLog
+        WHERE id = ?
+        LIMIT 1
+    ';
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    $nickname = trim((string)($row['nickname'] ?? ''));
+    if ($nickname !== '') {
+        return $nickname;
+    }
+
+    $name = trim((string)($row['name'] ?? ''));
+    if ($name !== '') {
+        return $name;
+    }
+
+    return $user_id;
+}
+
+function get_room_owner_transfer_targets(mysqli $db, int $room_no, string $exclude_user_id): array
+{
+    $sql = '
+        SELECT
+            m.user_id,
+            MIN(m.joined_at) AS joined_at,
+            MIN(m.no) AS member_no,
+            h.name,
+            h.nickname,
+            h.profile_img
+        FROM HereLogRoomMember m
+        LEFT JOIN HereLog h
+            ON h.id = m.user_id
+        WHERE m.room_no = ?
+          AND m.user_id <> ?
+        GROUP BY m.user_id, h.name, h.nickname, h.profile_img
+        ORDER BY MIN(m.joined_at) ASC, MIN(m.no) ASC
+    ';
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'is', $room_no, $exclude_user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $members = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $members[] = $row;
+    }
+
+    mysqli_stmt_close($stmt);
+    return $members;
+}
+
+function transfer_room_owner(mysqli $db, int $room_no, string $current_owner_id, string $new_owner_id): void
+{
+    $new_owner_id = trim($new_owner_id);
+
+    if ($new_owner_id === '') {
+        throw new RuntimeException('새 방장 정보가 없습니다.');
+    }
+
+    if ($new_owner_id === $current_owner_id) {
+        throw new RuntimeException('자기 자신에게는 방장을 넘길 수 없습니다.');
+    }
+
+    if (!is_room_owner_user($db, $room_no, $current_owner_id)) {
+        throw new RuntimeException('방장만 방장을 넘길 수 있습니다.');
+    }
+
+    if (!is_room_member($db, $room_no, $new_owner_id)) {
+        throw new RuntimeException('새 방장으로 선택한 사용자가 이 방의 멤버가 아닙니다.');
+    }
+
+    $newOwnerName = get_room_member_display_name($db, $new_owner_id);
+
+    $sql = 'UPDATE HereLogRoomMember SET role = "member" WHERE room_no = ? AND role = "owner"';
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $room_no);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    $sql = 'UPDATE HereLogRoomMember SET role = "owner" WHERE room_no = ? AND user_id = ?';
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'is', $room_no, $new_owner_id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    if (herelog_column_exists($db, 'HereLogRoom', 'owner_id')) {
+        $sql = 'UPDATE HereLogRoom SET owner_id = ?, ownername = ? WHERE no = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'ssi', $new_owner_id, $newOwnerName, $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    } else {
+        $sql = 'UPDATE HereLogRoom SET ownername = ? WHERE no = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'si', $newOwnerName, $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+}
+
+function delete_room_bundle(mysqli $db, int $room_no): array
+{
+    $filesToDelete = [];
+    $roomcode = '';
+
+    $sql = 'SELECT roomcode, imgpath FROM HereLogRoom WHERE no = ? LIMIT 1';
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $room_no);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $room = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    if ($room) {
+        $roomcode = (string)($room['roomcode'] ?? '');
+        if (!empty($room['imgpath'])) {
+            $filesToDelete[] = (string)$room['imgpath'];
+        }
+    }
+
+    if (herelog_table_exists($db, 'HereLogPost')) {
+        $sql = 'SELECT imgpath FROM HereLogPost WHERE room_no = ? AND imgpath IS NOT NULL AND imgpath <> ""';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        while ($row = mysqli_fetch_assoc($result)) {
+            $filesToDelete[] = (string)$row['imgpath'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+
+    if (herelog_table_exists($db, 'HereLogPostLike') && herelog_table_exists($db, 'HereLogPost')) {
+        $sql = '
+            DELETE l
+            FROM HereLogPostLike l
+            JOIN HereLogPost p ON p.no = l.post_no
+            WHERE p.room_no = ?
+        ';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    if (herelog_table_exists($db, 'HereLogPostComment') && herelog_table_exists($db, 'HereLogPost')) {
+        $sql = '
+            DELETE c
+            FROM HereLogPostComment c
+            JOIN HereLogPost p ON p.no = c.post_no
+            WHERE p.room_no = ?
+        ';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    if (herelog_table_exists($db, 'HereLogMarker')) {
+        $sql = 'DELETE FROM HereLogMarker WHERE room_no = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    if (herelog_table_exists($db, 'HereLogNotification') && herelog_column_exists($db, 'HereLogNotification', 'room_no')) {
+        $sql = 'DELETE FROM HereLogNotification WHERE room_no = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    if ($roomcode !== '' && herelog_table_exists($db, 'HereLogChat')) {
+        $sql = 'DELETE FROM HereLogChat WHERE room_code = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 's', $roomcode);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    if (herelog_table_exists($db, 'HereLogPost')) {
+        $sql = 'DELETE FROM HereLogPost WHERE room_no = ?';
+        $stmt = mysqli_prepare($db, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $room_no);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
+    $sql = 'DELETE FROM HereLogRoomMember WHERE room_no = ?';
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $room_no);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    $sql = 'DELETE FROM HereLogRoom WHERE no = ?';
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $room_no);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    return array_values(array_unique(array_filter($filesToDelete)));
+}
+
+if (!function_exists('safe_unlink_board_file')) {
+    function safe_unlink_board_file(?string $relativePath): void
+    {
+        $relativePath = trim((string)$relativePath);
+        if ($relativePath === '') {
+            return;
+        }
+
+        $relativePath = str_replace('\\', '/', $relativePath);
+        $relativePath = ltrim($relativePath, '/');
+
+        if (strpos($relativePath, 'uploads/') !== 0) {
+            return;
+        }
+
+        if ($relativePath === 'uploads/profile/default.png') {
+            return;
+        }
+
+        $boardDir = realpath(__DIR__ . '/../board');
+        if ($boardDir === false) {
+            return;
+        }
+
+        $absolutePath = realpath($boardDir . '/' . $relativePath);
+        if ($absolutePath === false) {
+            return;
+        }
+
+        if (strpos($absolutePath, $boardDir . DIRECTORY_SEPARATOR) !== 0) {
+            return;
+        }
+
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+    }
+}
+
 function require_room_member(mysqli $db, string $roomcode, string $user_id, string $redirectUrl = './main.php'): array
 {
     if ($roomcode === '') {

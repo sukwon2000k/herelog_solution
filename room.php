@@ -32,6 +32,7 @@ $member_count = get_room_member_count($db, $room_no);
 $members = get_room_members($db, $room_no, 8);
 $current_member_role = get_room_member_role($db, $room_no, $user_id) ?? '';
 $can_leave_room = (!$is_public_room && $current_member_role !== 'owner');
+$can_manage_room = (!$is_public_room && $current_member_role === 'owner');
 
 /*
     마커는 선택된 날짜의 게시글만 가져온다.
@@ -206,6 +207,18 @@ function fallbackCopyRoomCode(code) {
                     <small>현재 위치와 함께 새 기록을 남깁니다.</small>
                 </span>
             </a>
+
+<?php if ($can_manage_room) { ?>
+            <a
+                class="post-action-item"
+                href="./room_manage.php?code=<?php echo urlencode($roomcode); ?>">
+                <span class="post-action-icon">⚙</span>
+                <span>
+                    <strong>방 관리</strong>
+                    <small>방 삭제 또는 방장 넘겨주고 나가기를 관리합니다.</small>
+                </span>
+            </a>
+<?php } ?>
 
 <?php if ($can_leave_room) { ?>
             <form

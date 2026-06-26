@@ -1,24 +1,80 @@
-//날씨 좋으면 배경 바꾸기
+// ==========================================
+// 0. 날씨별 배경 이미지 설정
+// ==========================================
 const BACKGROUNDIMG = {
     default: "url('../src/image/background.png')",
-    good: "url('../src/image/background_spring.png')"
+    good: "url('../src/image/background_spring.png')",
+    rain: "url('../src/image/background_rain.png')",
+    snow: "url('../src/image/background_snow.png')"
 };
+
+const WEATHER_CACHE_KEY = 'herelog_weather_pty';
+const WEATHER_CACHE_MS = 10 * 60 * 1000; // 10분
+
+function getWeatherTypeFromPty(ptyCode) {
+    const code = String(ptyCode);
+
+    if (code === '1' || code === '2' || code === '5') {
+        return 'weather-rain';
+    }
+
+    if (code === '3' || code === '6' || code === '7') {
+        return 'weather-snow';
+    }
+
+    return 'weather-flower';
+}
 
 function setWeatherBackground(type) {
     const bg =
-        type === 'weather-flower'
-            ? BACKGROUNDIMG.good
-            : BACKGROUNDIMG.default;
+        type === 'weather-rain'
+            ? BACKGROUNDIMG.rain
+            : type === 'weather-snow'
+                ? BACKGROUNDIMG.snow
+                : type === 'weather-flower'
+                    ? BACKGROUNDIMG.good
+                    : BACKGROUNDIMG.default;
 
     document.documentElement.style.setProperty('--herelog-bg-image', bg);
 }
 
+function getCachedWeatherPty() {
+    try {
+        const raw = localStorage.getItem(WEATHER_CACHE_KEY);
 
+        if (!raw) {
+            return null;
+        }
 
+        const cached = JSON.parse(raw);
 
+        if (!cached || cached.pty === undefined || !cached.savedAt) {
+            return null;
+        }
 
+        if (Date.now() - cached.savedAt > WEATHER_CACHE_MS) {
+            return null;
+        }
 
+        return String(cached.pty);
+    } catch (e) {
+        return null;
+    }
+}
 
+function saveCachedWeatherPty(pty) {
+    try {
+        localStorage.setItem(
+            WEATHER_CACHE_KEY,
+            JSON.stringify({
+                pty: String(pty),
+                savedAt: Date.now()
+            })
+        );
+    } catch (e) {
+        // localStorage가 막혀 있어도 날씨 효과는 계속 동작한다.
+    }
+}
 
 // ==========================================
 // 1. 기상청 API용 좌표 변환 공식 (기존 유지)
@@ -61,8 +117,12 @@ function initWeatherService() {
             const grid = dfs_xy_conv("toXY", lat, lon);
             fetchWeather(grid.x, grid.y);
         }, (error) => {
-            console.warn("GPS 허용 안 됨, 기본 위치(서울) 실행");
+            console.warn("GPS 허용 안 됨 또는 지연됨, 기본 위치(서울) 실행");
             fetchWeather(60, 127);
+        }, {
+            enableHighAccuracy: false,
+            timeout: 2000,
+            maximumAge: 10 * 60 * 1000
         });
     } else {
         fetchWeather(60, 127);
@@ -75,36 +135,67 @@ function initWeatherService() {
 async function fetchWeather(nx, ny) {
     const API_KEY = "3f9c43096b143c16f55fd75c2fc562e5e074861f7de173220025e6c501016fd8";
     const now = new Date();
-    let hours = now.getHours();
-    if (now.getMinutes() < 40) hours -= 1;
-    if (hours < 0) hours = 23;
 
-    const base_date = now.toISOString().slice(0, 10).replace(/-/g, "");
+    let hours = now.getHours();
+
+    if (now.getMinutes() < 40) {
+        hours -= 1;
+    }
+
+    if (hours < 0) {
+        hours = 23;
+        now.setDate(now.getDate() - 1);
+    }
+
+    // toISOString()은 UTC라 한국 날짜와 어긋날 수 있으므로 로컬 날짜 사용
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+
+    const base_date = `${yyyy}${mm}${dd}`;
     const base_time = String(hours).padStart(2, '0') + "00";
     const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=10&dataType=JSON&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
 
     try {
         const res = await fetch(url);
-        const data = await res.json();
-        const items = data.response.body.items.item;
+        const text = await res.text();
+
+        // API 제한/오류로 JSON이 아닌 텍스트가 오는 경우 방어
+        if (!text.trim().startsWith('{')) {
+            console.warn("기상청 API가 JSON이 아닌 응답을 반환함:", text);
+            return;
+        }
+
+        const data = JSON.parse(text);
+        const items = data?.response?.body?.items?.item;
+
+        if (!Array.isArray(items)) {
+            console.warn("기상청 API 응답 구조가 예상과 다름:", data);
+            return;
+        }
+
         let pty = "0";
-        items.forEach(i => { if (i.category === "PTY") pty = i.obsrValue; });
+
+        items.forEach((i) => {
+            if (i.category === "PTY") {
+                pty = String(i.obsrValue);
+            }
+        });
+
+        saveCachedWeatherPty(pty);
         applyWeatherEffect(pty);
-    } catch (e) { console.error("날씨 정보 불러오기 실패:", e); }
+    } catch (e) {
+        console.error("날씨 정보 불러오기 실패:", e);
+    }
 }
 
 // ==========================================
 // 4. 날씨 효과 실행
 // ==========================================
 function applyWeatherEffect(ptyCode) {
-    const type =
-        (ptyCode === '1' || ptyCode === '2' || ptyCode === '5')
-            ? 'weather-rain'
-            : (ptyCode === '3' || ptyCode === '6' || ptyCode === '7')
-                ? 'weather-snow'
-                : 'weather-flower';
+    const type = getWeatherTypeFromPty(ptyCode);
 
-        setWeatherBackground(type);
+    setWeatherBackground(type);
 
     let container = document.getElementById('weather-container');
 
@@ -142,7 +233,6 @@ function applyWeatherEffect(ptyCode) {
         p.style.left = `${random(-5, 105)}vw`;
 
         /*
-            핵심:
             delay를 음수로 주면 페이지가 열렸을 때
             이미 떨어지는 중인 상태로 시작한다.
         */
@@ -162,5 +252,11 @@ function applyWeatherEffect(ptyCode) {
     }
 }
 
-// 🚀 실행: 페이지 로드 후 시작
-document.addEventListener('DOMContentLoaded', initWeatherService);
+// 페이지 로드 직후 빠르게 이전 날씨 또는 맑음 배경을 먼저 보여주고,
+// 실제 날씨는 뒤에서 다시 확인한다.
+document.addEventListener('DOMContentLoaded', () => {
+    const cachedPty = getCachedWeatherPty();
+
+    applyWeatherEffect(cachedPty !== null ? cachedPty : "0");
+    initWeatherService();
+});

@@ -277,14 +277,17 @@
     flex-direction:column;
     gap:14px;
 
-    position:absolute;
+    position:fixed;
 
     top:50%;
     left:50%;
 
-    transform:translate(-50%, -70%);
+    transform:translate(-50%, -50%);
 
-    z-index:1000; 
+    max-height:calc(100dvh - 80px);
+    overflow-y:auto;
+
+    z-index:10000;
 }
 
 .create-box h3{
@@ -621,4 +624,50 @@
 
     font-size:20px;
     cursor:pointer;
+}
+
+/* =========================
+   MOBILE CREATE ROOM MODAL
+========================= */
+
+@media (max-width: 480px){
+    .create-box{
+        width: calc(100% - 40px);
+        max-width: 360px;
+
+        margin: 0;
+        padding: 20px;
+
+        box-sizing: border-box;
+    }
+
+    .create-box.show{
+        position: fixed;
+
+        top: 150px;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+
+        z-index: 10000;
+    }
+
+    .create-box h3{
+        font-size: 20px;
+    }
+
+    .create-box input,
+    #createBtn,
+    #cancelBtn,
+    .upload-btn{
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    #preimg{
+        max-height: 150px;
+    }
 }
